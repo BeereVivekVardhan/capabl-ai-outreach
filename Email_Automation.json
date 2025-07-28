@@ -1,0 +1,1665 @@
+{
+  "name": "Email Automation",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "seconds",
+              "secondsInterval": 15
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1840,
+        -220
+      ],
+      "id": "5d4a45c6-3527-4c5e-8679-e8371329d9e7",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "text": "=Give me a list of the top 10 engineering colleges in India. Just provide college names as an array, no numbering or descriptions. Output only JSON like: [\"IIT Bombay\", \"IIT Delhi\", ...]",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "[\n  \"IIT Bombay\",\n  \"IIT Delhi\",\n  \"IIT Madras\",\n  \"BITS Pilani\",\n  \"NIT Trichy\"\n]\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -1400,
+        -940
+      ],
+      "id": "575d4d03-b80d-4160-ad8b-98045546626f",
+      "name": "Information Extractor",
+      "executeOnce": false,
+      "alwaysOutputData": false
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-flash-1.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1380,
+        -780
+      ],
+      "id": "91a36498-5ab7-4bd1-bb45-22508f7f3aae",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "mSPEDte1rKjsArUi",
+          "name": "infinity gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are a helpful assistant.\n\nGiven the name of a college in India, return:\n1. The official website URL\n2. A 2–3 line summary or description about the college\n\nReturn JSON:\n{\n  \"collegeName\": \"...\",\n  \"website\": \"...\",\n  \"aboutCollege\": \"...\"\n}\n\nCollege: {{ $json.collegeName }}\n",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"collegeName\": \"IIT Madras\",\n  \"website\": \"https://www.iitm.ac.in\",\n  \"aboutCollege\": \"Indian Institute of Technology Madras (IIT Madras) is one of India’s top engineering institutions, located in Chennai. It is renowned for its academic excellence and research in science and technology.\"\n}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -1220,
+        -720
+      ],
+      "id": "690398a2-8ba8-47c5-a3e8-7f4dcb154e44",
+      "name": "Information Extractor1"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-flash-1.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1200,
+        -560
+      ],
+      "id": "1de4ebe0-c135-4bf4-98d9-f552af7f8b54",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "mSPEDte1rKjsArUi",
+          "name": "infinity gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "text": "=You are an academic data assistant.\n\nGiven the college name and website, find the name of *any* Head of Department or senior faculty member listed on the site.\n\nIf no exact department is mentioned, choose any department you're confident exists in the college (like CSE, Mechanical, etc.).\n\nProvide:\n1. Name of the professor (Head or faculty)\n2. A likely email based on pattern\n3. A 1–2 line short bio\n\nOutput this in JSON:\n{\n  \"hodName\": \"\",\n  \"hodEmail\": \"\",\n  \"hodBio\": \"\"\n}\nExample:\nInput: IIT Madras, https://www.iitm.ac.in  \nOutput:\n{\n  \"hodName\": \"Prof. Abdus Samad\",\n  \"hodEmail\": \"samad@iitm.ac.in\",\n  \"hodBio\": \"Prof. Abdus Samad is a senior faculty in Ocean Engineering at IIT Madras.\"\n}\n\nNow you try:\n\nCollege: {{ $json.output.collegeName }}\nWebsite: {{ $json.output.website }}\n",
+        "schemaType": "fromJson",
+        "jsonSchemaExample": "{\n  \"hodName\": \"Prof. Abdus Samad\",\n  \"hodEmail\": \"samad@iitm.ac.in\",\n  \"hodBio\": \"Prof. Abdus Samad is a senior faculty member in the Department of Ocean Engineering at IIT Madras. His research focuses on cavitation, fluid dynamics, and turbomachinery.\"\n}\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.informationExtractor",
+      "typeVersion": 1.2,
+      "position": [
+        -820,
+        -640
+      ],
+      "id": "7c322125-9db4-4508-a841-3da8a8e898d9",
+      "name": "Information Extractor2"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-flash-1.5",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -800,
+        -480
+      ],
+      "id": "dc9c657d-79ad-46b5-83cf-497030ad4177",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "mSPEDte1rKjsArUi",
+          "name": "infinity gmail"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const output = item.json.output || {};\n\n  return {\n    json: {\n      hodName: output.hodName || '',\n      hodBio: output.hodBio || '',\n      email: 'test@example.com'\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -540,
+        -740
+      ],
+      "id": "35cbd715-7004-4595-bae3-40a6e2486575",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "numberInputs": 3,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        -420,
+        -940
+      ],
+      "id": "6d8a9443-f869-4ac0-8dab-55ea7717553b",
+      "name": "Merge"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      collegeName: item.json[\"output\"]\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -960,
+        -940
+      ],
+      "id": "47e682a9-c8ea-4177-b222-69340f01c200",
+      "name": "Code1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const output = item.json.output || {};\n\n  return {\n    json: {\n      website: output.website || '',\n      aboutCollege: output.aboutCollege || ''\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        -760,
+        -800
+      ],
+      "id": "4c27b169-a1ae-4a1d-8292-0563d0fbd3d7",
+      "name": "Code2"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "collegeName": "={{ $json.collegeName }}",
+            "website": "={{ $json.website }}",
+            "aboutCollege": "={{ $json.aboutCollege }}",
+            "email": "={{ $json.email }}",
+            "bio": "={{ $json.hodBio }}",
+            "hodName": "={{ $json.hodName }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "collegeName",
+              "displayName": "collegeName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "aboutCollege",
+              "displayName": "aboutCollege",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "hodName",
+              "displayName": "hodName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "bio",
+              "displayName": "bio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "sendStatus",
+              "displayName": "sendStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timeSent",
+              "displayName": "timeSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -220,
+        -940
+      ],
+      "id": "e1f10c3b-c0a6-4b86-9b18-da2c2a0c2d84",
+      "name": "Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -60,
+        -940
+      ],
+      "id": "3ed80fb9-bfb5-408c-b2f5-18f97f80750c",
+      "name": "Google Sheets1",
+      "executeOnce": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "7f8c0c89-afcd-4404-99f3-4a6cbe44c93f",
+              "leftValue": "={{ $json.sendStatus }}",
+              "rightValue": "=",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        60,
+        -220
+      ],
+      "id": "53c09a47-2ca6-4979-ac41-e682ea6f17f7",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        340,
+        -480
+      ],
+      "id": "b9fca69e-3679-4845-99c2-62e94cfa3341",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You're an assistant generating a professional academic outreach email.\n\nWrite a unique and personalized cold email to the Head of Department mentioned below. The email should sound respectful, formal, and friendly. Use the provided details to tailor the message specifically to them and their institution.\n\nDetails:\n- Sender Name: Vivek Vardhan  \n- Title: Innovation Strategist  \n- Organization: NexusAI Technologies  \n- Organization's Expertise: AI-driven EdTech solutions  \n- Contact: Phone - 8341617830 | Email - 255185vivek@gmail.com  \n\nRecipient:\n- HoD Name: {{ $json.hodName }}\n- College Name: {{ $json.collegeName }}\n- College Website: {{ $json.website }}\n- About College: {{ $json.aboutCollege }}\n- HoD Bio: {{ $json.bio }}\n\nInstructions:\n- Address the HoD by name (e.g., Dear Prof. XYZ)\n- Introduce yourself and your organization\n- Reference something relevant about the college or HoD if possible\n- Express interest in collaboration\n- Use one or two concise paragraphs\n- Sign off professionally with your name, title, org, and contact\n\nReply with ONLY the email body (no subject, no extra text, no explanation).\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        540,
+        -460
+      ],
+      "id": "09315246-e018-41a4-9c2d-db6ea4c4203e",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        600,
+        -640
+      ],
+      "id": "57ffc775-f930-4aff-b074-b84a65928040",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "6fQIhtNJWF4cGFsU",
+          "name": "255185V"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $('If').item.json.email }}",
+        "subject": "Regarding Collaboration Opportunity – NexusAI Technologies",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        860,
+        -460
+      ],
+      "id": "07bbd8df-1c1e-44b3-ba49-a5aa15077149",
+      "name": "Gmail",
+      "webhookId": "2518d49c-84c5-49c7-83f7-0fcf7dbef1c1",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1LBLwCSiS1fCY7OD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "sendStatus": "={{ $json.sendStatus }}",
+            "timeSent": "={{ $json.timeSent }}",
+            "collegeName": "={{ $json.collegeName }}"
+          },
+          "matchingColumns": [
+            "collegeName"
+          ],
+          "schema": [
+            {
+              "id": "collegeName",
+              "displayName": "collegeName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "aboutCollege",
+              "displayName": "aboutCollege",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hodName",
+              "displayName": "hodName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "bio",
+              "displayName": "bio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "sendStatus",
+              "displayName": "sendStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timeSent",
+              "displayName": "timeSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        1140,
+        -220
+      ],
+      "id": "63acbc29-5d4d-4778-82c2-630dc9e07dad",
+      "name": "Google Sheets2",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        -1680,
+        -220
+      ],
+      "id": "3353e204-ee54-436c-a9d0-8f4d7ea75d17",
+      "name": "Google Sheets3",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      },
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "d3e3ace6-da34-41e2-baeb-1f5a1561a57a",
+              "leftValue": "={{ $json.collegeName }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -1520,
+        -220
+      ],
+      "id": "5c644d8c-8d5b-4d2e-ba00-e07cc5bcb3ca",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "amount": "={{ Math.floor(Math.random() * 10) }}"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1020,
+        -460
+      ],
+      "id": "677d8f77-c6fe-4d30-a3c1-08135c14bae4",
+      "name": "Wait",
+      "webhookId": "844cf1cc-4b57-48c7-a06a-de9f39b47f7f"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        620,
+        -220
+      ],
+      "id": "9bc60bd3-d704-4159-ab2c-014c6bea37e6",
+      "name": "Merge1"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const json = {\n    ...item.json\n  };\n\n  return {\n    json\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        840,
+        -220
+      ],
+      "id": "bd2ee7a8-eeb7-4946-bbc5-276efe184998",
+      "name": "Code3"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  return {\n    json: {\n      ...item.json,\n      sendStatus: \"Sent\",\n      timeSent: new Date().toLocaleString(\"en-IN\", { timeZone: \"Asia/Kolkata\" })\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1180,
+        -460
+      ],
+      "id": "c32c8628-0531-41f6-a12c-511fb2430d79",
+      "name": "Code4"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "52f50536-d5d9-4174-b54e-ee8c0d6719e3",
+              "leftValue": "={{ $json.senderEmail }}",
+              "rightValue": "gmail.com",
+              "operator": {
+                "type": "string",
+                "operation": "endsWith"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2080,
+        340
+      ],
+      "id": "dd863e36-e9a4-44bf-a5cb-b039fff672b9",
+      "name": "If2"
+    },
+    {
+      "parameters": {
+        "jsCode": "return items.map(item => {\n  const fromValue = item.json.from?.value?.[0] || {};\n  const senderName = fromValue.name || fromValue.address || \"there\";\n  const senderEmail = fromValue.address || \"\";\n  const message = item.json.text || \"\";\n  const subject = item.json.subject || \"\";\n  const messageId = item.json.id || \"\";\n\n  return {\n    json: {\n      senderName,\n      senderEmail,\n      message,\n      subject,\n      messageId  // 🔥 Here's your messageId\n    }\n  };\n});\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1860,
+        340
+      ],
+      "id": "5a04b435-1814-4d23-94a6-fec225c4dcf3",
+      "name": "Code5"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "email",
+              "lookupValue": "={{ $json.senderEmail }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        2320,
+        240
+      ],
+      "id": "e6479cda-1bf2-428b-abc0-62469a84fb04",
+      "name": "Google Sheets4",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=You are Vivek Vardhan from NexusAI.\n\nThe user has replied: \"{{ $('If2').item.json.message }}\"\n\nWrite a professional and polite reply thanking them for their interest in AI collaboration. Mention NexusAI's mission and offer to take the conversation forward.\n\nUse this format:\n\nDear {{ $json.hodName || \"Professor\" }},\n\nThank you for your recent inquiry about AI collaboration opportunities. We were delighted to hear from you and appreciate your interest in NexusAI’s innovative solutions.\n\nAt NexusAI, we are focused on pushing the boundaries of what AI can achieve and are eager to collaborate with forward-thinking organizations who share our vision of a future powered by intelligent technology. Our team of experts is dedicated to providing customized AI solutions that cater to unique academic and research needs while yielding tangible outcomes.\n\nI’d be happy to discuss possibilities further or provide more insights about our capabilities. You can reach me directly at 255185vivek@gmail.com or on phone at 8341617830.\n\nLooking forward to our collaboration.\n\nBest regards,  \nVivek Vardhan  \nBrainTrust, NexusAI\n\nReply with ONLY the body of the email.\n",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        3040,
+        240
+      ],
+      "id": "c677569e-9a94-4525-9fec-3f022a05ec7e",
+      "name": "AI Agent1"
+    },
+    {
+      "parameters": {
+        "model": "mistralai/mistral-7b-instruct",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        3060,
+        440
+      ],
+      "id": "607ebd4a-8ae0-4e14-b5f6-c055687c0c9c",
+      "name": "OpenRouter Chat Model4",
+      "credentials": {
+        "openRouterApi": {
+          "id": "6fQIhtNJWF4cGFsU",
+          "name": "255185V"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "reply",
+        "messageId": "={{ $('Code5').item.json.messageId }}",
+        "emailType": "text",
+        "message": "={{ $json.output }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3360,
+        240
+      ],
+      "id": "ab099331-2795-4d46-915a-57d06860a87d",
+      "name": "Gmail1",
+      "webhookId": "499852bd-c34c-4c3f-bb1c-fdbbefbaebd7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1LBLwCSiS1fCY7OD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4ea8d687-5e0b-47c9-a576-b9eda94e7579",
+              "leftValue": "={{ $json.replySentStatus }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        2540,
+        240
+      ],
+      "id": "5f486aee-fc74-4ff5-927f-e3aa9476ff8d",
+      "name": "If3"
+    },
+    {
+      "parameters": {
+        "amount": "={{Math.floor(Math.random() * 10)}}\n"
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        3760,
+        240
+      ],
+      "id": "dc453316-931d-4874-b7ac-de6405826df4",
+      "name": "Wait1",
+      "webhookId": "5bb6e0eb-79c1-473c-9ce3-a26355fd5e14"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  {\n    json: {\n      ...items.json,\n      replySentStatus: \"Replied\",\n      timereplySent: new Date().toLocaleString(\"en-IN\", {\n        timeZone: \"Asia/Kolkata\"\n      }),\n    }\n  }\n];\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        3940,
+        240
+      ],
+      "id": "d90321c6-e74b-4cb9-94d7-51685b6ccf5f",
+      "name": "Code6"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2780,
+        220
+      ],
+      "id": "be40a188-f65a-44de-a717-30c6d0e40b08",
+      "name": "Loop Over Items1"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI",
+          "mode": "list",
+          "cachedResultName": "College_HoD_Details",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Sheet1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/16jj6N6LjivWKPov10fMDLQ0mo_OT6PO_-F4zOVI6ARI/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "replySentStatus": "={{ $json.replySentStatus }}",
+            "timereplySent": "={{ $json.timereplySent }}",
+            "email": "={{ $json.email }}"
+          },
+          "matchingColumns": [
+            "email"
+          ],
+          "schema": [
+            {
+              "id": "collegeName",
+              "displayName": "collegeName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "website",
+              "displayName": "website",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "aboutCollege",
+              "displayName": "aboutCollege",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "hodName",
+              "displayName": "hodName",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "bio",
+              "displayName": "bio",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "email",
+              "displayName": "email",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "sendStatus",
+              "displayName": "sendStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "timeSent",
+              "displayName": "timeSent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "replySentStatus",
+              "displayName": "replySentStatus",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "timereplySent",
+              "displayName": "timereplySent",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.6,
+      "position": [
+        3880,
+        -20
+      ],
+      "id": "b114ae96-ae39-4096-968c-9cab419c5f5f",
+      "name": "Google Sheets5",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "sH7kuE8tkoq1fc3c",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "getAll",
+        "simple": false,
+        "filters": {
+          "labelIds": [
+            "INBOX",
+            "CATEGORY_PERSONAL"
+          ],
+          "readStatus": "unread"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1640,
+        340
+      ],
+      "id": "b83d0448-b32e-4a8b-bcb8-7d99d95f2b42",
+      "name": "Gmail2",
+      "webhookId": "5f127838-f198-4bc1-a110-c82b29f1865a",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1LBLwCSiS1fCY7OD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "hours"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        1440,
+        340
+      ],
+      "id": "1d0e1fce-d78b-4979-9f80-5e83d9ff84a6",
+      "name": "Schedule Trigger1"
+    },
+    {
+      "parameters": {
+        "mode": "combine",
+        "combineBy": "combineByPosition",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.merge",
+      "typeVersion": 3.2,
+      "position": [
+        3160,
+        -20
+      ],
+      "id": "54e3228c-f427-42d3-bfc1-c9a285942224",
+      "name": "Merge2"
+    },
+    {
+      "parameters": {
+        "operation": "markAsRead",
+        "messageId": "={{ $('Code5').item.json.messageId }}"
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        3580,
+        240
+      ],
+      "id": "99a3514b-705e-4ae6-a90e-0294635b2ebe",
+      "name": "Gmail3",
+      "webhookId": "fc68b0b2-ee01-4a41-afb7-f48b41d3f4c8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "1LBLwCSiS1fCY7OD",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "output",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        -1100,
+        -940
+      ],
+      "id": "e2886c55-07e2-4415-9eca-7dae5dd4bdf4",
+      "name": "Split Out"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor": {
+      "main": [
+        [
+          {
+            "node": "Split Out",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor1": {
+      "main": [
+        [
+          {
+            "node": "Code2",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Information Extractor2",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Information Extractor2": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 2
+          }
+        ]
+      ]
+    },
+    "Code1": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Information Extractor1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code2": {
+      "main": [
+        [
+          {
+            "node": "Merge",
+            "type": "main",
+            "index": 1
+          }
+        ]
+      ]
+    },
+    "Google Sheets": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets1": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Merge1",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Gmail",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail": {
+      "main": [
+        [
+          {
+            "node": "Wait",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets3": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Information Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait": {
+      "main": [
+        [
+          {
+            "node": "Code4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge1": {
+      "main": [
+        [
+          {
+            "node": "Code3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code3": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code4": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code5": {
+      "main": [
+        [
+          {
+            "node": "If2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets4",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Sheets4": {
+      "main": [
+        [
+          {
+            "node": "If3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model4": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent1",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent1": {
+      "main": [
+        [
+          {
+            "node": "Gmail1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If3": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Wait1": {
+      "main": [
+        [
+          {
+            "node": "Code6",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail1": {
+      "main": [
+        [
+          {
+            "node": "Gmail3",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items1": {
+      "main": [
+        [
+          {
+            "node": "Merge2",
+            "type": "main",
+            "index": 1
+          }
+        ],
+        [
+          {
+            "node": "AI Agent1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code6": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail2": {
+      "main": [
+        [
+          {
+            "node": "Code5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger1": {
+      "main": [
+        [
+          {
+            "node": "Gmail2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge2": {
+      "main": [
+        [
+          {
+            "node": "Google Sheets5",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Gmail3": {
+      "main": [
+        [
+          {
+            "node": "Wait1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Split Out": {
+      "main": [
+        [
+          {
+            "node": "Code1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "8c94bae1-e947-4b11-b2ff-a0fdcf3028d7",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "beabf6304df1d26720a4429c246714be94daf804905a1df1c8203683ff6a7791"
+  },
+  "id": "XQXwsn3vkh1h4Rpv",
+  "tags": []
+}
