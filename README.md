@@ -25,7 +25,8 @@ This project automates outreach to top engineering colleges using:
 - MERN Stack (Optional Dashboard)
 
 ## 📸 Screenshots
-Add your `workflow.png`, Google Sheet logs, reply screenshots, etc.
+
+<img width="1833" height="688" alt="Screenshot 2025-06-25 200409" src="https://github.com/user-attachments/assets/17e6cdff-1676-4e89-86fb-1c292d38bd95" />
 
 ## 🤖 Sample Workflow
 Download the n8n export: `workflow.json`
